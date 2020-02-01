@@ -1,0 +1,21 @@
+﻿@page "/preview"
+
+<h1>Preview</h1>
+
+<p>This is where you'll be able to test your built links to see whether the RSS Feed is correctly generated.</p>
+
+Generated link:
+<input type="text" @bind(link) />
+<br />
+<br />
+<button class="btn btn-primary" @onclick="ShowPreview">Show Preview</button>
+
+@code {
+    private void ShowPreview()
+    {
+        string link;
+
+        // TODO: Do the thing
+        throw new NotImplementedException();
+    }
+}
