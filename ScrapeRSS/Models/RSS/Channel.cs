@@ -4,9 +4,8 @@ using System.Xml.Serialization;
 namespace ScrapeRSS.Models.RSS
 {
     /// <summary>
-    /// Represents the root objects an RSS feed is generated from
+    /// Represents the channel an RSS feed is generated for
     /// </summary>
-    [XmlRoot("channel")]
     public class Channel
     {
         /// <summary>
