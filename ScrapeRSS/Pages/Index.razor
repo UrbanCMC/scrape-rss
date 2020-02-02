@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject NavigationManager  navManager
 
 <h1>Link Builder</h1>
 
@@ -61,8 +62,50 @@
 
     private void GenerateLink()
     {
-        // TODO: Generate link and move to preview
-        throw new NotImplementedException();
+        // TODO: Validate fields
+
+        var parameters = new Dictionary<string, string>();
+        parameters.Add("url", url);
+        parameters.Add("maxResults", maxResults.ToString());
+
+        if (!string.IsNullOrWhiteSpace(matchIdOrClass))
+        {
+            parameters.Add("matchIdOrClass", matchIdOrClass);
+        }
+
+        if (!string.IsNullOrWhiteSpace(matchItemUrl))
+        {
+            parameters.Add("matchItemUrl", matchItemUrl);
+        }
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            parameters.Add("title", title);
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemTitleSelector))
+        {
+            parameters.Add("itemTitleSelector", itemTitleSelector);
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemUrlSelector))
+        {
+            parameters.Add("itemUrlSelector", itemUrlSelector);
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemDescriptionSelector))
+        {
+            parameters.Add("itemDescriptionSelector", itemDescriptionSelector);
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemDateSelector))
+        {
+            parameters.Add("itemDateSelector", itemDateSelector);
+        }
+
+        var rssLink = QueryHelpers.AddQueryString(navManager.ToAbsoluteUri("generate-feed").ToString(), parameters);
+        var previewLink = QueryHelpers.AddQueryString(navManager.ToAbsoluteUri("preview").ToString(), new Dictionary<string, string> { { "link", rssLink } });
+        navManager.NavigateTo(previewLink);
     }
 
     private void ToggleAdvancedSettings()

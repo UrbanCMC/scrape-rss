@@ -1,4 +1,5 @@
 ﻿@page "/preview"
+@page "/preview/{link}"
 
 <h1>Preview</h1>
 
@@ -8,13 +9,14 @@
 </p>
 
 Generated link:
-<input type="text" @bind="link" />
+<input type="text" class="input-max" @bind="Link" />
 <br />
 <br />
 <button class="btn btn-primary" @onclick="ShowPreview">Show Preview</button>
 
 @code {
-    string link;
+    [Parameter]
+    public string Link { get; set; }
 
     private void ShowPreview()
     {
