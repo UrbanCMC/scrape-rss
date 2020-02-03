@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using HtmlAgilityPack;
@@ -56,7 +57,7 @@ namespace ScrapeRSS.Web
                 if (string.IsNullOrWhiteSpace(settings.ItemSelector))
                 {
                     // Nodes contain a simple <a> we can create the item from
-                    var title = nodeNav.SelectSingleNode("./text()")?.Value;
+                    var title = WebUtility.HtmlDecode(nodeNav.SelectSingleNode("./text()")?.Value);
                     var url = nodeNav.SelectSingleNode("./@href").Value;
 
                     // Convert relative URL to absolute (works fine if URL is already absolute)
@@ -132,6 +133,10 @@ namespace ScrapeRSS.Web
                         }
                     }
 
+                    title = WebUtility.HtmlDecode(title);
+                    description = WebUtility.HtmlDecode(description);
+                    author = WebUtility.HtmlDecode(author);
+
                     // Convert relative URL to absolute (works fine if URL is already absolute)
                     url = new Uri(baseUrl, url).AbsoluteUri;
 
@@ -172,7 +177,7 @@ namespace ScrapeRSS.Web
                 throw new InvalidOperationException("No website has been loaded for parsing.");
             }
 
-            var title = htmlNavigator.SelectSingleNode("//head/title")?.Value;
+            var title = WebUtility.HtmlDecode(htmlNavigator.SelectSingleNode("//head/title")?.Value);
             return title ?? "No title available";
         }
 
