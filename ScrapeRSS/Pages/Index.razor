@@ -4,8 +4,7 @@
 <h1>Link Builder</h1>
 
 <p class="alert alert-info">
-    This is where you'll be able to build the links used to generate RSS feeds by scraping public websites that don't provide their own.<br />
-    But for now, it's only a placeholder.
+    This is where you can build the links used to generate RSS feeds by scraping public websites that don't provide their own.
 </p>
 
 <label for="url">URL of the website to scrape <small>(required)</small></label>
@@ -25,19 +24,25 @@
     <label for="title">Specify the title of the generated feed. Omit to use the title of the scraped website.</label>
     <input type="text" id="title" class="input-large" name="title" @bind="title" placeholder="use website title" />
 
+    <label for="author">Specify the author of the generated feed. Omit to use the title of the scraped website.</label>
+    <input type="text" id="author" class="input-large" name="author" @bind="author" placeholder="exclude" />
+
     <label for="maxResults">The maximum number of items to return in the generated feed. (Between 1-100)</label>
     <input type="number" id="maxResults" class="input-small" name="maxResults" @bind="maxResults" min="1" max="100" step="1" />
 
-    <label for="itemTitleSelector">Use this CSS selector to get the item title. Omit to use the text of the first matched &lt;a&gt; element.</label>
+    <label for="itemTitleSelector">Use this XPath selector to get the item title. Omit to use the text of the first matched &lt;a&gt; element.</label>
     <input type="text" id="itemTitleSelector" class="input-large" name="itemTitleSelector" @bind="itemTitleSelector" placeholder="use link text" />
 
-    <label for="itemUrlSelector">Use this CSS selector to get the item URL. Omit to use the URL of the first matched &lt;a&gt; element.</label>
+    <label for="itemUrlSelector">Use this XPath selector to get the item URL. Omit to use the URL of the first matched &lt;a&gt; element.</label>
     <input type="text" id="itemUrlSelector" class="input-large" name="itemUrlSelector" @bind="itemUrlSelector" placeholder="use first URL" />
 
-    <label for="itemDescriptionSelector">Use this CSS selector to get the item description. Omit to add no description to the generated feed.</label>
+    <label for="itemDescriptionSelector">Use this XPath selector to get the item description. Omit to add no description to the generated feed.</label>
     <input type="text" id="itemDescriptionSelector" class="input-large" name="itemDescriptionSelector" @bind="itemDescriptionSelector" placeholder="exclude" />
 
-    <label for="itemDateSelector">Use this CSS selector to get the item publish date. Omit to add no date to the generated feed.</label>
+    <label for="itemAuthorSelector">Use this XPath selector to get the item author. Omit to add no author to the generated feed.</label>
+    <input type="text" id="itemAuthorSelector" class="input-large" name="itemAuthorSelector" @bind="itemAuthorSelector" placeholder="exclude" />
+
+    <label for="itemDateSelector">Use this XPath selector to get the item publish date. Omit to add no date to the generated feed.</label>
     <input type="text" id="itemDateSelector" class="input-large" name="itemDateSelector" @bind="itemDateSelector" placeholder="exclude" />
 </BSCollapse>
 
@@ -51,11 +56,13 @@
     string matchItemUrl;
 
     string title;
+    string author;
     int maxResults = 10;
 
     string itemTitleSelector;
     string itemUrlSelector;
     string itemDescriptionSelector;
+    string itemAuthorSelector;
     string itemDateSelector;
 
     bool advancedSettingsVisible = false;
@@ -83,6 +90,11 @@
             parameters.Add("title", title);
         }
 
+        if (!string.IsNullOrWhiteSpace(author))
+        {
+            parameters.Add("author", author);
+        }
+
         if (!string.IsNullOrWhiteSpace(itemTitleSelector))
         {
             parameters.Add("itemTitleSelector", itemTitleSelector);
@@ -98,13 +110,18 @@
             parameters.Add("itemDescriptionSelector", itemDescriptionSelector);
         }
 
+        if (!string.IsNullOrWhiteSpace(itemAuthorSelector))
+        {
+            parameters.Add("itemAuthorSelector", itemAuthorSelector);
+        }
+
         if (!string.IsNullOrWhiteSpace(itemDateSelector))
         {
             parameters.Add("itemDateSelector", itemDateSelector);
         }
 
-        var rssLink = QueryHelpers.AddQueryString(navManager.ToAbsoluteUri("generate-feed").ToString(), parameters);
-        var previewLink = QueryHelpers.AddQueryString(navManager.ToAbsoluteUri("preview").ToString(), new Dictionary<string, string> { { "link", rssLink } });
+        var rssLink = QueryHelpers.AddQueryString(navManager.ToAbsoluteUri("api/generate-feed").ToString(), parameters);
+        var previewLink = navManager.ToAbsoluteUri($"preview/{Uri.EscapeDataString(rssLink)}").ToString();
         navManager.NavigateTo(previewLink);
     }
 
