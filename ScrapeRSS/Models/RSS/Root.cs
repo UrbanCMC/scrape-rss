@@ -18,6 +18,6 @@ namespace ScrapeRSS.Models.RSS
         /// Gets the RSS version
         /// </summary>
         [XmlAttribute("version")]
-        public string Version => "2.0";
+        public string Version { get; set; } = "2.0";
     }
 }
