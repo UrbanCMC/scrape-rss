@@ -8,6 +8,12 @@
     This is where you can build the links used to generate RSS feeds by scraping public websites that don't provide their own.
 </p>
 
+<input type="text" id="existingFeedLink" class="input-max" name="existingFeedLink" @bind="existingFeedLink" placeholder="Paste previously generated link here" />
+<br />
+<button type="button" class="btn btn-primary" @onclick="ParseLink">Parse Link</button>
+<br />
+<br />
+
 <label for="url">URL of the website to scrape <small>(required)</small></label>
 <input type="text" id="url" class="input-max" name="url" @bind="url" placeholder="http://" required />
 
@@ -79,6 +85,7 @@
     string itemDateSelector;
 
     bool advancedSettingsVisible = false;
+    string existingFeedLink;
 
     string validationError;
     bool validationErrorVisible = false;
@@ -174,6 +181,99 @@
         var rssLink = QueryHelpers.AddQueryString(navManager.ToAbsoluteUri("api/generate-feed").ToString(), parameters);
         var previewLink = navManager.ToAbsoluteUri($"preview/{Uri.EscapeDataString(rssLink)}").ToString();
         navManager.NavigateTo(previewLink);
+    }
+
+    private void ParseLink()
+    {
+        // Empty all fields, so there's no need to worry about missing parameters
+        SetDefaultValues();
+
+        if (string.IsNullOrWhiteSpace(existingFeedLink))
+        {
+            return;
+        }
+
+        var queryParams = QueryHelpers.ParseQuery(new Uri(existingFeedLink).Query);
+        if (queryParams.ContainsKey("url"))
+        {
+            url = queryParams["url"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("maxResults"))
+        {
+            int.TryParse(queryParams["maxResults"].FirstOrDefault(), out maxResults);
+        }
+
+        if (queryParams.ContainsKey("matchIdOrClass"))
+        {
+            matchIdOrClass = queryParams["matchIdOrClass"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("matchItemUrl"))
+        {
+            matchItemUrl = queryParams["matchItemUrl"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("title"))
+        {
+            title = queryParams["title"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("author"))
+        {
+            author = queryParams["author"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("itemSelector"))
+        {
+            itemSelector = queryParams["itemSelector"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("itemTitleSelector"))
+        {
+            itemTitleSelector = queryParams["itemTitleSelector"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("itemUrlSelector"))
+        {
+            itemUrlSelector = queryParams["itemUrlSelector"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("itemDescriptionSelector"))
+        {
+            itemDescriptionSelector = queryParams["itemDescriptionSelector"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("itemAuthorSelector"))
+        {
+            itemAuthorSelector = queryParams["itemAuthorSelector"].FirstOrDefault();
+        }
+
+        if (queryParams.ContainsKey("itemDateSelector"))
+        {
+            itemDateSelector = queryParams["itemDateSelector"].FirstOrDefault();
+        }
+    }
+
+    private void SetDefaultValues()
+    {
+        url = "";
+
+        matchIdOrClass = "";
+        matchItemUrl = "";
+
+        title = "";
+        author = "";
+        maxResults = 10;
+
+        itemSelector = "";
+        itemTitleSelector = "";
+        itemUrlSelector = "";
+        itemDescriptionSelector = "";
+        itemAuthorSelector = "";
+        itemDateSelector = "";
+
+        StateHasChanged();
     }
 
     private void ToggleAdvancedSettings()

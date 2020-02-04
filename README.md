@@ -17,8 +17,8 @@ If this bothers you as it does me, you can use this web app to keep that informa
 ## Features
 * Generate API links that will return the scraped data as RSS feed.
 * Every aspect of the links can be set through the 'Link Builder' page, so there's no need to manually modify the URL parameters directly.
+* Paste already built links back into the 'Link Builder', so that they can be modified without re-entering everything.
 
 ## ToDo
 * Implement preview page, so it's easier to quickly check whether the generated link is correct.
-* Paste already built links back into the 'Link Builder', so that they can be modified without re-entering everything.
 * Persist state between page changes. Switching back to the 'Link Builder' shouldn't clear it.
