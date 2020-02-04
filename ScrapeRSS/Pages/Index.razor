@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject NavigationManager  navManager
+@using ScrapeRSS.Models
 
 <h1>Link Builder</h1>
 
@@ -30,6 +31,9 @@
     <label for="maxResults">The maximum number of items to return in the generated feed. (Between 1-100)</label>
     <input type="number" id="maxResults" class="input-small" name="maxResults" @bind="maxResults" min="1" max="100" step="1" />
 
+    <label for="itemSelector">Use this XPath selector to get the item element. <strong>Cannot be used at the same time as the 'Id/Class Filter'</strong></label>
+    <input type="text" id="itemSelector" class="input-large" name="itemSelector" @bind="itemSelector" placeholder="no selector" />
+
     <label for="itemTitleSelector">Use this XPath selector to get the item title. Omit to use the text of the first matched &lt;a&gt; element.</label>
     <input type="text" id="itemTitleSelector" class="input-large" name="itemTitleSelector" @bind="itemTitleSelector" placeholder="use link text" />
 
@@ -48,6 +52,14 @@
 
 <br />
 <button type="button" class="btn btn-primary" @onclick="GenerateLink">Generate Link</button>
+<br />
+<br />
+
+<BSCollapse IsOpen="validationErrorVisible">
+    <p class="alert alert-warning">
+        @validationError
+    </p>
+</BSCollapse>
 
 @code {
     string url;
@@ -59,6 +71,7 @@
     string author;
     int maxResults = 10;
 
+    string itemSelector;
     string itemTitleSelector;
     string itemUrlSelector;
     string itemDescriptionSelector;
@@ -67,9 +80,42 @@
 
     bool advancedSettingsVisible = false;
 
+    string validationError;
+    bool validationErrorVisible = false;
+
+    private bool AreFieldsValid()
+    {
+        // Generate settings model and use its validation logic
+        var settings = new FeedGeneratorSettings()
+        {
+            Author = author,
+            ItemAuthorSelector = itemAuthorSelector,
+            ItemDateSelector = itemDateSelector,
+            ItemDescriptionSelector = itemDescriptionSelector,
+            ItemSelector = itemSelector,
+            ItemTitleSelector = itemTitleSelector,
+            ItemUrlSelector = itemUrlSelector,
+            MatchIdOrClass = matchIdOrClass,
+            MatchItemUrl = matchItemUrl,
+            MaxResults = maxResults,
+            Title = title,
+            Url = url
+        };
+
+        var valid = settings.Validate();
+        validationError = settings.ValidationError;
+        validationErrorVisible = !string.IsNullOrWhiteSpace(validationError);
+        StateHasChanged();
+
+        return valid;
+    }
+
     private void GenerateLink()
     {
-        // TODO: Validate fields
+        if (!AreFieldsValid())
+        {
+            return;
+        }
 
         var parameters = new Dictionary<string, string>();
         parameters.Add("url", url);
@@ -93,6 +139,11 @@
         if (!string.IsNullOrWhiteSpace(author))
         {
             parameters.Add("author", author);
+        }
+
+        if (!string.IsNullOrWhiteSpace(itemSelector))
+        {
+            parameters.Add("itemSelector", itemSelector);
         }
 
         if (!string.IsNullOrWhiteSpace(itemTitleSelector))

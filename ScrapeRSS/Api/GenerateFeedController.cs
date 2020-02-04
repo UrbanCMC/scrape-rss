@@ -13,6 +13,11 @@ namespace ScrapeRSS.Api
         [HttpGet]
         public async Task<ActionResult> GetFeed([FromQuery]FeedGeneratorSettings settings)
         {
+            if (!settings.Validate())
+            {
+                return Content(settings.ValidationError, "text/plain");
+            }
+
             return Content(await RssFeedBuilder.GetFeed(settings), "text/xml");
         }
     }

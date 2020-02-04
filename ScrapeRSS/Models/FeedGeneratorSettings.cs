@@ -88,6 +88,18 @@
         {
             ValidationError = "";
 
+            if (string.IsNullOrWhiteSpace(Url))
+            {
+                ValidationError = "A value for 'url' must be specified.";
+                return false;
+            }
+
+            if (MaxResults < 1 || MaxResults > 100)
+            {
+                ValidationError = "'maxResults' must be between 1-100, inclusive.";
+                return false;
+            }
+
             if (!string.IsNullOrWhiteSpace(MatchIdOrClass) && !string.IsNullOrWhiteSpace(ItemSelector))
             {
                 ValidationError = "Can't use both 'matchIdOrClass' and 'itemSelector' at the same time.";
