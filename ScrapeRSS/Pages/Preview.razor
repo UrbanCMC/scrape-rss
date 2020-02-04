@@ -1,5 +1,6 @@
 ﻿@page "/preview"
 @page "/preview/{link}"
+@inject HttpClient  httpClient
 
 <h1>Preview</h1>
 
@@ -12,16 +13,30 @@ Generated link:
 <input type="text" class="input-max" @bind="Link" />
 <br />
 <br />
-<button class="btn btn-primary" @onclick="ShowPreview">Show Preview</button>
+<button class="btn btn-primary" @onclick="ShowPreviewAsync">Show Preview</button>
+
+<BSCollapse IsOpen="previewResultVisible">
+    <textarea style="width: 80%; min-height: 400px;">@previewResult</textarea>
+</BSCollapse>
 
 @code {
     [Parameter]
     public string Link { get; set; }
 
-    private void ShowPreview()
-    {
+    string previewResult;
+    bool previewResultVisible = false;
 
-        // TODO: Do the thing
-        throw new NotImplementedException();
+    private async Task ShowPreviewAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Link))
+        {
+            previewResultVisible = false;
+            StateHasChanged();
+            return;
+        }
+
+        previewResult = await httpClient.GetStringAsync(Link);
+        previewResultVisible = true;
+        StateHasChanged();
     }
 }

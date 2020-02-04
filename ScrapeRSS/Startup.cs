@@ -1,4 +1,8 @@
+using System;
+using System.Linq;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +47,19 @@ namespace ScrapeRSS
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            // Register httpClient, which isn't done by default
+            if (!services.Any(a => a.ServiceType == typeof(HttpClient)))
+            {
+                services.AddScoped(s =>
+                {
+                    var uriHelper = s.GetRequiredService<NavigationManager>();
+                    return new HttpClient
+                    {
+                        BaseAddress = new Uri(uriHelper.BaseUri)
+                    };
+                });
+            }
         }
     }
 }
